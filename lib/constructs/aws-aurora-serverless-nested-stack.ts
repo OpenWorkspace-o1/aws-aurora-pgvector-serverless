@@ -22,12 +22,12 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
 
         // define subnetAttributes as an array of Record<string, string> with subnetId comes from props.vpcPrivateSubnetIds and availabilityZone comes from props.vpcPrivateSubnetAzs
         const subnetAttributes: Record<string, string>[] = props.vpcPrivateSubnetIds.map((subnetId, index) => {
-        return {
-            subnetId: subnetId,
-            availabilityZone: props.vpcPrivateSubnetAzs[index],
-            routeTableId: props.vpcPrivateSubnetRouteTableIds[index],
-            type: vpcSubnetType,
-        };
+            return {
+                subnetId: subnetId,
+                availabilityZone: props.vpcPrivateSubnetAzs[index],
+                routeTableId: props.vpcPrivateSubnetRouteTableIds[index],
+                type: vpcSubnetType,
+            };
         });
         console.log('subnetAttributes:', JSON.stringify(subnetAttributes));
 
@@ -75,7 +75,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             writer: rds.ClusterInstance.serverlessV2('writer'),
             readers: [
                 rds.ClusterInstance.serverlessV2('reader', {
-                scaleWithWriter: true,
+                    scaleWithWriter: true,
                 }),
             ],
             storageEncrypted: true,
@@ -115,8 +115,8 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
         if (props.auroraEngine === AuroraEngine.AuroraPostgresql) {
             NagSuppressions.addResourceSuppressions(auroraDatabaseCluster, [
                 {
-                id: 'AwsSolutions-RDS14',
-                reason: 'Backtrack is not supported for Aurora PostgreSQL clusters',
+                    id: 'AwsSolutions-RDS14',
+                    reason: 'Backtrack is not supported for Aurora PostgreSQL clusters',
                 },
             ]);
         }
