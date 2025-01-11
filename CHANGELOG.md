@@ -1,3 +1,11 @@
+## [2025-01-11](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/3)
+
+### Added
+- Introduced `AwsAuroraPgvectorServerlessStack` for deploying Aurora Serverless v2 with PostgreSQL and MySQL support.
+- Added `AwsAuroraPgvectorServerlessStackProps` interface for stack configuration, including VPC, subnets, and database credentials.
+- Implemented utility functions for environment variable validation and parsing.
+- Added tagging and best-practice checks using `ApplyTags` and `AwsSolutionsChecks`.
+
 ## [2025-01-11](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/1)
 
 ### Added
