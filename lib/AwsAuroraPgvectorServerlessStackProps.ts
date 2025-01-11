@@ -1,7 +1,7 @@
 import { StackProps } from "aws-cdk-lib";
 import { ClusterScailabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
 
-export interface AwsAuroraPgvectorServerlessStackProps extends StackProps {
+export interface AwsAuroraPgvectorServerlessBaseStackProps {
     /** Resource prefix for all AWS resources */
     readonly resourcePrefix: string;
     /** AWS region where resources will be deployed */
@@ -22,6 +22,9 @@ export interface AwsAuroraPgvectorServerlessStackProps extends StackProps {
     readonly vpcPrivateSubnetAzs: string[];
     /** List of route table IDs for private subnets */
     readonly vpcPrivateSubnetRouteTableIds: string[];
+}
+
+export interface AwsAuroraPgvectorServerlessStackProps extends StackProps, AwsAuroraPgvectorServerlessBaseStackProps {
     /** Aurora database engine type */
     readonly auroraEngine: AuroraEngine;
     /** Maximum capacity units for Aurora Serverless v2 */
