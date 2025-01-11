@@ -1,6 +1,6 @@
-# AWS Aurora Serverless CDK Project
+# AWS Aurora Pgvector Serverless CDK Project
 
-This project provides an AWS CDK implementation for deploying an Aurora Serverless v2 cluster with either PostgreSQL or MySQL compatibility.
+This project provides an AWS CDK implementation for deploying an Aurora Serverless v2 cluster with pgvector extension.
 
 ## Features
 
