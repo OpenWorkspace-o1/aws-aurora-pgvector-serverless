@@ -1,7 +1,7 @@
 import { StackProps } from "aws-cdk-lib";
-import { ClusterScailabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
+import { ClusterScalabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
 
-export interface AwsAuroraPgvectorServerlessStackProps extends StackProps {
+export interface AwsAuroraPgvectorServerlessBaseStackProps {
     /** Resource prefix for all AWS resources */
     readonly resourcePrefix: string;
     /** AWS region where resources will be deployed */
@@ -22,8 +22,9 @@ export interface AwsAuroraPgvectorServerlessStackProps extends StackProps {
     readonly vpcPrivateSubnetAzs: string[];
     /** List of route table IDs for private subnets */
     readonly vpcPrivateSubnetRouteTableIds: string[];
-    /** Aurora database engine type */
-    readonly auroraEngine: AuroraEngine;
+}
+
+export interface AwsAuroraPgvectorServerlessStackProps extends StackProps, AwsAuroraPgvectorServerlessBaseStackProps {
     /** Maximum capacity units for Aurora Serverless v2 */
     readonly serverlessV2MaxCapacity: number;
     /** Minimum capacity units for Aurora Serverless v2 */
@@ -39,13 +40,5 @@ export interface AwsAuroraPgvectorServerlessStackProps extends StackProps {
     /** Enhanced monitoring interval in minutes */
     readonly monitoringInterval: number;
     /** Type of cluster scalability configuration */
-    readonly clusterScailabilityType: ClusterScailabilityType;
-}
-
-/** Supported Aurora database engine types */
-export enum AuroraEngine {
-    /** PostgreSQL-compatible Aurora engine */
-    AuroraPostgresql = "aurora-postgresql",
-    /** MySQL-compatible Aurora engine */
-    AuroraMysql = "aurora-mysql",
+    readonly clusterScalabilityType: ClusterScalabilityType;
 }

@@ -69,7 +69,6 @@ This project provides an AWS CDK implementation for deploying an Aurora Serverle
    - `OWNER`: Owner tag value
    - `VPC_ID`: Target VPC ID
    - `VPC_SUBNET_TYPE`: `PRIVATE_WITH_EGRESS`, `PRIVATE_ISOLATED`, or `PUBLIC`
-   - `AURORA_ENGINE`: `aurora-postgresql` or `aurora-mysql`
    - `SERVERLESS_V2_MAX_CAPACITY`: Maximum ACU capacity
    - `SERVERLESS_V2_MIN_CAPACITY`: Minimum ACU capacity
    - `RDS_USERNAME`: Database admin username
