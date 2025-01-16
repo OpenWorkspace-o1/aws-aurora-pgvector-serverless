@@ -81,7 +81,7 @@ const stackProps: AwsAuroraPgvectorServerlessStackProps = {
 };
 new AwsAuroraPgvectorServerlessStack(app, `AwsAuroraPgvectorServerlessStack`, {
     ...stackProps,
-    stackName: `${deployEnvironment}-AwsAuroraPgvectorServerlessStack`,
+    stackName: `${appName}-${deployEnvironment}-AwsAuroraPgvectorServerlessStack`,
     description: `AwsAuroraPgvectorServerlessStack for ${appName} in ${cdkRegion} ${deployEnvironment}.`,
 });
 
