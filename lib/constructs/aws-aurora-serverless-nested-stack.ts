@@ -62,8 +62,8 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
                 availabilityZone: subnetAttribute.availabilityZone,
                 routeTableId: subnetAttribute.routeTableId,
             });
-            });
-            const vpcSubnetSelection: SubnetSelection = vpc.selectSubnets({
+        });
+        const vpcSubnetSelection: SubnetSelection = vpc.selectSubnets({
             subnets: vpcPrivateISubnets,
             availabilityZones: props.vpcPrivateSubnetAzs,
         });
