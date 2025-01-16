@@ -1,7 +1,6 @@
 import { NestedStackProps } from "aws-cdk-lib";
 import { AuroraEngine, AwsAuroraPgvectorServerlessBaseStackProps } from "../AwsAuroraPgvectorServerlessStackProps";
-import { DBClusterStorageType } from "aws-cdk-lib/aws-rds";
-import { ClusterScailabilityType } from "aws-cdk-lib/aws-rds";
+import { ClusterScalabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
 
 export interface AwsAuroraPgvectorServerlessNestedStackProps extends NestedStackProps, AwsAuroraPgvectorServerlessBaseStackProps {
     /** Aurora database engine type */
@@ -21,5 +20,5 @@ export interface AwsAuroraPgvectorServerlessNestedStackProps extends NestedStack
     /** Enhanced monitoring interval in minutes */
     readonly monitoringInterval: number;
     /** Type of cluster scalability configuration */
-    readonly clusterScailabilityType: ClusterScailabilityType;
+    readonly clusterScalabilityType: ClusterScalabilityType;
 }

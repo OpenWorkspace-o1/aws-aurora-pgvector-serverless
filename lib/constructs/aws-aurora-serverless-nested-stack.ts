@@ -63,9 +63,9 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
 
         const removalPolicy = props.deployEnvironment === 'production' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY;
         const auroraDatabaseCluster = new rds.DatabaseCluster(this, `${props.resourcePrefix}-Aurora-Serverless`, {
-        engine: props.auroraEngine === AuroraEngine.AuroraPostgresql ?
-            rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_16_6 }) :
-            rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_3_08_0 }),
+            engine: props.auroraEngine === AuroraEngine.AuroraPostgresql ?
+                rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_16_6 }) :
+                rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_3_08_0 }),
             vpc,
             vpcSubnets: vpcSubnetSelection,
             securityGroups: [auroraSecurityGroup],
@@ -92,7 +92,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             defaultDatabaseName: props.defaultDatabaseName,
             monitoringInterval: cdk.Duration.minutes(props.monitoringInterval),
             cloudwatchLogsExports: ['error', 'general', 'slowquery'],
-            clusterScailabilityType: props.clusterScailabilityType,
+            clusterScalabilityType: props.clusterScalabilityType,
         });
 
         // Add suppression for the deletion protection warning
