@@ -25,8 +25,6 @@ export interface AwsAuroraPgvectorServerlessBaseStackProps {
 }
 
 export interface AwsAuroraPgvectorServerlessStackProps extends StackProps, AwsAuroraPgvectorServerlessBaseStackProps {
-    /** Aurora database engine type */
-    readonly auroraEngine: AuroraEngine;
     /** Maximum capacity units for Aurora Serverless v2 */
     readonly serverlessV2MaxCapacity: number;
     /** Minimum capacity units for Aurora Serverless v2 */
@@ -43,12 +41,4 @@ export interface AwsAuroraPgvectorServerlessStackProps extends StackProps, AwsAu
     readonly monitoringInterval: number;
     /** Type of cluster scalability configuration */
     readonly clusterScalabilityType: ClusterScalabilityType;
-}
-
-/** Supported Aurora database engine types */
-export enum AuroraEngine {
-    /** PostgreSQL-compatible Aurora engine */
-    AuroraPostgresql = "aurora-postgresql",
-    /** MySQL-compatible Aurora engine */
-    AuroraMysql = "aurora-mysql",
 }

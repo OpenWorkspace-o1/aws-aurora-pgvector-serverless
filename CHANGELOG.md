@@ -1,3 +1,14 @@
+## [2025-01-16](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/6)
+
+### Changed
+- Removed `AURORA_ENGINE` configuration and hardcoded PostgreSQL support.
+- Simplified stack naming by removing region from `stackName`.
+- Updated monitoring role configuration and interval to seconds.
+
+### Added
+- Added `AwsAuroraDDLSourceRDSNestedStack` for DDL script deployment via S3.
+- Improved parsing for `clusterScalabilityType` and `storageType`.
+
 ## [2025-01-11](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/3)
 
 ### Added

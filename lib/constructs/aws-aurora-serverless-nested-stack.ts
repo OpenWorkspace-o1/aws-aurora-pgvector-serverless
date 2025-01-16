@@ -8,10 +8,32 @@ import { NagSuppressions } from 'cdk-nag';
 import { SubnetSelection } from 'aws-cdk-lib/aws-ec2';
 import { SecretValue } from 'aws-cdk-lib';
 import { parseVpcSubnetType } from "../../utils/vpc-type-parser";
-import { AuroraEngine } from "../AwsAuroraPgvectorServerlessStackProps";
-import { AwsAuroraPgvectorServerlessNestedStackProps } from "./AwsAuroraPgvectorServerlessNestedStackProps";
+import { NestedStackProps } from "aws-cdk-lib";
+import { AwsAuroraPgvectorServerlessBaseStackProps } from "../AwsAuroraPgvectorServerlessStackProps";
+import { ClusterScalabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
+
+export interface AwsAuroraPgvectorServerlessNestedStackProps extends NestedStackProps, AwsAuroraPgvectorServerlessBaseStackProps {
+    /** Maximum capacity units for Aurora Serverless v2 */
+    readonly serverlessV2MaxCapacity: number;
+    /** Minimum capacity units for Aurora Serverless v2 */
+    readonly serverlessV2MinCapacity: number;
+    /** Username for RDS database access */
+    readonly rdsUsername: string;
+    /** Password for RDS database access */
+    readonly rdsPassword: string;
+    /** Name of the default database to be created */
+    readonly defaultDatabaseName: string;
+    /** Storage type for the Aurora cluster */
+    readonly storageType: DBClusterStorageType;
+    /** Enhanced monitoring interval in minutes */
+    readonly monitoringInterval: number;
+    /** Type of cluster scalability configuration */
+    readonly clusterScalabilityType: ClusterScalabilityType;
+}
 
 export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
+    readonly clusterIdentifier: string;
+
     constructor(scope: Construct, id: string, props: AwsAuroraPgvectorServerlessNestedStackProps) {
         super(scope, id, props);
 
@@ -38,8 +60,8 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
                 availabilityZone: subnetAttribute.availabilityZone,
                 routeTableId: subnetAttribute.routeTableId,
             });
-            });
-            const vpcSubnetSelection: SubnetSelection = vpc.selectSubnets({
+        });
+        const vpcSubnetSelection: SubnetSelection = vpc.selectSubnets({
             subnets: vpcPrivateISubnets,
             availabilityZones: props.vpcPrivateSubnetAzs,
         });
@@ -47,13 +69,13 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
         const kmsKey = new kms.Key(this, `${props.resourcePrefix}-Aurora-KMS-Key`, {
             enabled: true,
             enableKeyRotation: true,
-            rotationPeriod: cdk.Duration.days(30),
+            rotationPeriod: cdk.Duration.days(90),
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             keyUsage: kms.KeyUsage.ENCRYPT_DECRYPT,
             keySpec: kms.KeySpec.SYMMETRIC_DEFAULT,
         });
 
-        const auroraPort = props.auroraEngine === AuroraEngine.AuroraPostgresql ? 5432 : 3306;
+        const auroraPort = 5432;
         const auroraSecurityGroup = new ec2.SecurityGroup(this, `${props.resourcePrefix}-Aurora-Security-Group`, {
             vpc,
             allowAllOutbound: false,
@@ -61,11 +83,43 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
         });
         auroraSecurityGroup.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 
+        // Create custom monitoring role instead of using AWS managed policy
+        const monitoringRole = new cdk.aws_iam.Role(this, `${props.resourcePrefix}-Aurora-Monitoring-Role`, {
+            assumedBy: new cdk.aws_iam.ServicePrincipal('monitoring.rds.amazonaws.com'),
+            description: 'Role for RDS Enhanced Monitoring',
+            inlinePolicies: {
+                monitoringPolicy: new cdk.aws_iam.PolicyDocument({
+                    statements: [
+                        new cdk.aws_iam.PolicyStatement({
+                            actions: [
+                                'logs:CreateLogGroup',
+                                'logs:PutLogEvents',
+                                'logs:DescribeLogStreams',
+                                'logs:DescribeLogGroups',
+                                'cloudwatch:PutMetricData'
+                            ],
+                            resources: [
+                                `arn:aws:logs:${this.region}:${this.account}:log-group:/aws/rds/*`,
+                                `arn:aws:logs:${this.region}:${this.account}:log-group:/aws/rds/*:log-stream:*`,
+                                `arn:aws:cloudwatch:${this.region}:${this.account}:*`
+                            ],
+                        }),
+                    ],
+                }),
+            },
+        });
+
+        // add NagSuppressions for the AwsSolutions-IAM5 warning for monitoringRole
+        NagSuppressions.addResourceSuppressions(monitoringRole, [
+            {
+                id: 'AwsSolutions-IAM5',
+                reason: 'Custom monitoring role is used instead of AWS managed policy',
+            },
+        ]);
+
         const removalPolicy = props.deployEnvironment === 'production' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY;
         const auroraDatabaseCluster = new rds.DatabaseCluster(this, `${props.resourcePrefix}-Aurora-Serverless`, {
-            engine: props.auroraEngine === AuroraEngine.AuroraPostgresql ?
-                rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_16_6 }) :
-                rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_3_08_0 }),
+            engine: rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_16_6 }),
             vpc,
             vpcSubnets: vpcSubnetSelection,
             securityGroups: [auroraSecurityGroup],
@@ -88,12 +142,12 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
                 preferredWindow: '03:00-04:00',
             },
             storageType: props.storageType,
-            backtrackWindow: props.auroraEngine === AuroraEngine.AuroraMysql ? cdk.Duration.hours(24) : undefined,
             defaultDatabaseName: props.defaultDatabaseName,
-            monitoringInterval: cdk.Duration.minutes(props.monitoringInterval),
-            cloudwatchLogsExports: ['error', 'general', 'slowquery'],
+            monitoringInterval: cdk.Duration.seconds(props.monitoringInterval),
             clusterScalabilityType: props.clusterScalabilityType,
+            monitoringRole: monitoringRole,
         });
+        this.clusterIdentifier = auroraDatabaseCluster.clusterIdentifier;
 
         // Add suppression for the deletion protection warning
         NagSuppressions.addResourceSuppressions(auroraDatabaseCluster, [
@@ -112,14 +166,12 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
         ]);
 
         // Add suppression for backtrack warning if using PostgreSQL
-        if (props.auroraEngine === AuroraEngine.AuroraPostgresql) {
-            NagSuppressions.addResourceSuppressions(auroraDatabaseCluster, [
-                {
-                    id: 'AwsSolutions-RDS14',
-                    reason: 'Backtrack is not supported for Aurora PostgreSQL clusters',
-                },
-            ]);
-        }
+        NagSuppressions.addResourceSuppressions(auroraDatabaseCluster, [
+            {
+                id: 'AwsSolutions-RDS14',
+                reason: 'Backtrack is not supported for Aurora PostgreSQL clusters',
+            },
+        ]);
 
         new cdk.CfnOutput(this, `${props.resourcePrefix}-Aurora-Endpoint`, {
             value: auroraDatabaseCluster.clusterEndpoint.hostname,
