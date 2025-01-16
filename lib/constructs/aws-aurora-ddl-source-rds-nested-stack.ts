@@ -13,21 +13,29 @@ export interface AwsAuroraDDLSourceRDSNestedStackProps extends cdk.NestedStackPr
 }
 
 export class AwsAuroraDDLSourceRDSNestedStack extends cdk.NestedStack {
-  readonly sourceS3Bucket: s3.Bucket;
+  readonly ddlVectorScriptSourceBucket: s3.Bucket;
 
   constructor(scope: Construct, id: string, props: AwsAuroraDDLSourceRDSNestedStackProps) {
     super(scope, id, props);
 
     // create S3 bucket to host DDL file
-    const ddlSourceBucket = new s3.Bucket(this, `${props.resourcePrefix}-ddl-source-bucket`, {
-      bucketName: `${props.resourcePrefix}-ddl-source-${props.clusterIdentifier}`
+    const sourceS3Bucket = new s3.Bucket(this, `${props.resourcePrefix}-ddl-source-bucket`, {
+        bucketName: `${props.resourcePrefix}-ddl-source-${props.clusterIdentifier}`,
+        encryption: s3.BucketEncryption.S3_MANAGED,
+        blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+        publicReadAccess: false,
+        removalPolicy: props.removalPolicy,
+        autoDeleteObjects: props.removalPolicy === cdk.RemovalPolicy.DESTROY,
+        accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+        versioned: true,
+        enforceSSL: true,
     });
-    this.sourceS3Bucket = ddlSourceBucket;
+    this.ddlVectorScriptSourceBucket = sourceS3Bucket;
 
     // create s3 bucket deployment to upload the DDL file
     new s3deploy.BucketDeployment(this, `${props.resourcePrefix}-deploy-ddl-source-rds`, {
         sources: [s3deploy.Source.asset(path.join(__dirname, "../scripts/rds-ddl-sql"))],
-        destinationBucket: ddlSourceBucket
+        destinationBucket: sourceS3Bucket
     });
   }
 }
