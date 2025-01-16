@@ -20,7 +20,7 @@ export class AwsAuroraDDLSourceRDSNestedStack extends cdk.NestedStack {
 
     // create S3 bucket to host DDL file
     const sourceS3Bucket = new s3.Bucket(this, `${props.resourcePrefix}-ddl-source-bucket`, {
-        bucketName: `${props.resourcePrefix}-ddl-source-${props.clusterIdentifier}`,
+        bucketName: `${props.deployEnvironment}-ddl-source-${props.clusterIdentifier}`,
         encryption: s3.BucketEncryption.S3_MANAGED,
         blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
         publicReadAccess: false,
@@ -34,7 +34,7 @@ export class AwsAuroraDDLSourceRDSNestedStack extends cdk.NestedStack {
 
     // create s3 bucket deployment to upload the DDL file
     new s3deploy.BucketDeployment(this, `${props.resourcePrefix}-deploy-ddl-source-rds`, {
-        sources: [s3deploy.Source.asset(path.join(__dirname, "../scripts/rds-ddl-sql"))],
+        sources: [s3deploy.Source.asset(path.join(__dirname, '../../scripts/rds-ddl-sql'))],
         destinationBucket: sourceS3Bucket
     });
   }

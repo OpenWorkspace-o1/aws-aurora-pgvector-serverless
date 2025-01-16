@@ -69,7 +69,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
         const kmsKey = new kms.Key(this, `${props.resourcePrefix}-Aurora-KMS-Key`, {
             enabled: true,
             enableKeyRotation: true,
-            rotationPeriod: cdk.Duration.days(30),
+            rotationPeriod: cdk.Duration.days(90),
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             keyUsage: kms.KeyUsage.ENCRYPT_DECRYPT,
             keySpec: kms.KeySpec.SYMMETRIC_DEFAULT,
@@ -109,8 +109,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             },
             storageType: props.storageType,
             defaultDatabaseName: props.defaultDatabaseName,
-            monitoringInterval: cdk.Duration.minutes(props.monitoringInterval),
-            cloudwatchLogsExports: ['error', 'general', 'slowquery'],
+            monitoringInterval: cdk.Duration.seconds(props.monitoringInterval),
             clusterScalabilityType: props.clusterScalabilityType,
         });
         this.clusterIdentifier = auroraDatabaseCluster.clusterIdentifier;
