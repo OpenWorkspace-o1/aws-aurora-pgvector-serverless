@@ -9,7 +9,7 @@ import { ApplyTags } from '../utils/apply-tag';
 import { Aspects } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
 import { AwsAuroraPgvectorServerlessStack } from '../lib/aws-aurora-pgvector-serverless-stack';
-import { AuroraEngine, AwsAuroraPgvectorServerlessStackProps } from '../lib/AwsAuroraPgvectorServerlessStackProps';
+import { AwsAuroraPgvectorServerlessStackProps } from '../lib/AwsAuroraPgvectorServerlessStackProps';
 import { parseStorageTypeFromEnv } from '../utils/storage-type-parser';
 import { parseClusterScalabilityTypeFromEnv } from '../utils/cluster-scalability-parser';
 
@@ -28,7 +28,6 @@ checkEnvVariables('APP_NAME',
     'VPC_PRIVATE_SUBNET_ROUTE_TABLE_IDS',
     'OWNER',
     'VPC_ID',
-    'AURORA_ENGINE',
     'SERVERLESS_V2_MAX_CAPACITY',
     'SERVERLESS_V2_MIN_CAPACITY',
     'RDS_USERNAME',
@@ -71,7 +70,6 @@ const stackProps: AwsAuroraPgvectorServerlessStackProps = {
     vpcPrivateSubnetIds: process.env.VPC_PRIVATE_SUBNET_IDS!.split(','),
     vpcPrivateSubnetAzs: process.env.VPC_PRIVATE_SUBNET_AZS!.split(','),
     vpcPrivateSubnetRouteTableIds: process.env.VPC_PRIVATE_SUBNET_ROUTE_TABLE_IDS!.split(','),
-    auroraEngine: process.env.AURORA_ENGINE as AuroraEngine,
     serverlessV2MaxCapacity: Number(process.env.SERVERLESS_V2_MAX_CAPACITY!),
     serverlessV2MinCapacity: Number(process.env.SERVERLESS_V2_MIN_CAPACITY!),
     rdsUsername: process.env.RDS_USERNAME!,
