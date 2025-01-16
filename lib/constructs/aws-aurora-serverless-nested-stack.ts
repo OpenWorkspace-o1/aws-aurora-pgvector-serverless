@@ -8,10 +8,34 @@ import { NagSuppressions } from 'cdk-nag';
 import { SubnetSelection } from 'aws-cdk-lib/aws-ec2';
 import { SecretValue } from 'aws-cdk-lib';
 import { parseVpcSubnetType } from "../../utils/vpc-type-parser";
-import { AuroraEngine } from "../AwsAuroraPgvectorServerlessStackProps";
-import { AwsAuroraPgvectorServerlessNestedStackProps } from "./AwsAuroraPgvectorServerlessNestedStackProps";
+import { NestedStackProps } from "aws-cdk-lib";
+import { AuroraEngine, AwsAuroraPgvectorServerlessBaseStackProps } from "../AwsAuroraPgvectorServerlessStackProps";
+import { ClusterScalabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
+
+export interface AwsAuroraPgvectorServerlessNestedStackProps extends NestedStackProps, AwsAuroraPgvectorServerlessBaseStackProps {
+    /** Aurora database engine type */
+    readonly auroraEngine: AuroraEngine;
+    /** Maximum capacity units for Aurora Serverless v2 */
+    readonly serverlessV2MaxCapacity: number;
+    /** Minimum capacity units for Aurora Serverless v2 */
+    readonly serverlessV2MinCapacity: number;
+    /** Username for RDS database access */
+    readonly rdsUsername: string;
+    /** Password for RDS database access */
+    readonly rdsPassword: string;
+    /** Name of the default database to be created */
+    readonly defaultDatabaseName: string;
+    /** Storage type for the Aurora cluster */
+    readonly storageType: DBClusterStorageType;
+    /** Enhanced monitoring interval in minutes */
+    readonly monitoringInterval: number;
+    /** Type of cluster scalability configuration */
+    readonly clusterScalabilityType: ClusterScalabilityType;
+}
 
 export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
+    readonly clusterIdentifier: string;
+
     constructor(scope: Construct, id: string, props: AwsAuroraPgvectorServerlessNestedStackProps) {
         super(scope, id, props);
 
@@ -94,6 +118,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             cloudwatchLogsExports: ['error', 'general', 'slowquery'],
             clusterScalabilityType: props.clusterScalabilityType,
         });
+        this.clusterIdentifier = auroraDatabaseCluster.clusterIdentifier;
 
         // Add suppression for the deletion protection warning
         NagSuppressions.addResourceSuppressions(auroraDatabaseCluster, [
