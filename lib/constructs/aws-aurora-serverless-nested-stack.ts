@@ -22,12 +22,12 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
 
         // define subnetAttributes as an array of Record<string, string> with subnetId comes from props.vpcPrivateSubnetIds and availabilityZone comes from props.vpcPrivateSubnetAzs
         const subnetAttributes: Record<string, string>[] = props.vpcPrivateSubnetIds.map((subnetId, index) => {
-        return {
-            subnetId: subnetId,
-            availabilityZone: props.vpcPrivateSubnetAzs[index],
-            routeTableId: props.vpcPrivateSubnetRouteTableIds[index],
-            type: vpcSubnetType,
-        };
+            return {
+                subnetId: subnetId,
+                availabilityZone: props.vpcPrivateSubnetAzs[index],
+                routeTableId: props.vpcPrivateSubnetRouteTableIds[index],
+                type: vpcSubnetType,
+            };
         });
         console.log('subnetAttributes:', JSON.stringify(subnetAttributes));
 
@@ -63,9 +63,9 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
 
         const removalPolicy = props.deployEnvironment === 'production' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY;
         const auroraDatabaseCluster = new rds.DatabaseCluster(this, `${props.resourcePrefix}-Aurora-Serverless`, {
-        engine: props.auroraEngine === AuroraEngine.AuroraPostgresql ?
-            rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_16_6 }) :
-            rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_3_08_0 }),
+            engine: props.auroraEngine === AuroraEngine.AuroraPostgresql ?
+                rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_16_6 }) :
+                rds.DatabaseClusterEngine.auroraMysql({ version: rds.AuroraMysqlEngineVersion.VER_3_08_0 }),
             vpc,
             vpcSubnets: vpcSubnetSelection,
             securityGroups: [auroraSecurityGroup],
@@ -75,7 +75,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             writer: rds.ClusterInstance.serverlessV2('writer'),
             readers: [
                 rds.ClusterInstance.serverlessV2('reader', {
-                scaleWithWriter: true,
+                    scaleWithWriter: true,
                 }),
             ],
             storageEncrypted: true,
@@ -92,7 +92,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             defaultDatabaseName: props.defaultDatabaseName,
             monitoringInterval: cdk.Duration.minutes(props.monitoringInterval),
             cloudwatchLogsExports: ['error', 'general', 'slowquery'],
-            clusterScailabilityType: props.clusterScailabilityType,
+            clusterScalabilityType: props.clusterScalabilityType,
         });
 
         // Add suppression for the deletion protection warning
@@ -115,8 +115,8 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
         if (props.auroraEngine === AuroraEngine.AuroraPostgresql) {
             NagSuppressions.addResourceSuppressions(auroraDatabaseCluster, [
                 {
-                id: 'AwsSolutions-RDS14',
-                reason: 'Backtrack is not supported for Aurora PostgreSQL clusters',
+                    id: 'AwsSolutions-RDS14',
+                    reason: 'Backtrack is not supported for Aurora PostgreSQL clusters',
                 },
             ]);
         }

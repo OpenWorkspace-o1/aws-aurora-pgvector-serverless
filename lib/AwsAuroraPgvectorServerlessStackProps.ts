@@ -1,5 +1,5 @@
 import { StackProps } from "aws-cdk-lib";
-import { ClusterScailabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
+import { ClusterScalabilityType, DBClusterStorageType } from "aws-cdk-lib/aws-rds";
 
 export interface AwsAuroraPgvectorServerlessBaseStackProps {
     /** Resource prefix for all AWS resources */
@@ -42,7 +42,7 @@ export interface AwsAuroraPgvectorServerlessStackProps extends StackProps, AwsAu
     /** Enhanced monitoring interval in minutes */
     readonly monitoringInterval: number;
     /** Type of cluster scalability configuration */
-    readonly clusterScailabilityType: ClusterScailabilityType;
+    readonly clusterScalabilityType: ClusterScalabilityType;
 }
 
 /** Supported Aurora database engine types */

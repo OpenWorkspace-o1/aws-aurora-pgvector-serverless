@@ -11,7 +11,7 @@ import { AwsSolutionsChecks } from 'cdk-nag';
 import { AwsAuroraPgvectorServerlessStack } from '../lib/aws-aurora-pgvector-serverless-stack';
 import { AuroraEngine, AwsAuroraPgvectorServerlessStackProps } from '../lib/AwsAuroraPgvectorServerlessStackProps';
 import { parseStorageTypeFromEnv } from '../utils/storage-type-parser';
-import { parseClusterScailabilityTypeFromEnv } from '../utils/cluster-scailability-parser';
+import { parseClusterScalabilityTypeFromEnv } from '../utils/cluster-scalability-parser';
 
 dotenv.config(); // Load environment variables from .env file
 const app = new cdk.App();
@@ -79,7 +79,7 @@ const stackProps: AwsAuroraPgvectorServerlessStackProps = {
     defaultDatabaseName: process.env.DEFAULT_DATABASE_NAME!,
     storageType: parseStorageTypeFromEnv(),
     monitoringInterval: Number(process.env.MONITORING_INTERVAL!),
-    clusterScailabilityType: parseClusterScailabilityTypeFromEnv(),
+    clusterScalabilityType: parseClusterScalabilityTypeFromEnv(),
 };
 new AwsAuroraPgvectorServerlessStack(app, `AwsAuroraPgvectorServerlessStack`, {
     ...stackProps,
