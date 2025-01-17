@@ -146,6 +146,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             monitoringInterval: cdk.Duration.seconds(props.monitoringInterval),
             clusterScalabilityType: props.clusterScalabilityType,
             monitoringRole: monitoringRole,
+            instanceUpdateBehaviour: rds.InstanceUpdateBehaviour.ROLLING,
         });
         this.clusterIdentifier = auroraDatabaseCluster.clusterIdentifier;
 
