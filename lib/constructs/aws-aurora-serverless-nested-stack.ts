@@ -25,7 +25,7 @@ export interface AwsAuroraPgvectorServerlessNestedStackProps extends NestedStack
     readonly defaultDatabaseName: string;
     /** Storage type for the Aurora cluster */
     readonly storageType: DBClusterStorageType;
-    /** Enhanced monitoring interval in minutes */
+    /** Enhanced monitoring interval in seconds */
     readonly monitoringInterval: number;
     /** Type of cluster scalability configuration */
     readonly clusterScalabilityType: ClusterScalabilityType;
