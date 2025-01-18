@@ -37,6 +37,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
     constructor(scope: Construct, id: string, props: AwsAuroraPgvectorServerlessNestedStackProps) {
         super(scope, id, props);
 
+        const removalPolicy = props.deployEnvironment === 'production' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY;
         const vpc = ec2.Vpc.fromLookup(this, `${props.resourcePrefix}-VPC-Imported`, {
             vpcId: props.vpcId,
         });
@@ -66,6 +67,14 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             availabilityZones: props.vpcPrivateSubnetAzs,
         });
 
+        // Create subnet group for Aurora cluster
+        const auroraSubnetGroup = new rds.SubnetGroup(this, `${props.resourcePrefix}-Aurora-Subnet-Group`, {
+            vpc,
+            description: 'Subnet group for Aurora Serverless cluster',
+            vpcSubnets: vpcSubnetSelection,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+        });
+
         const kmsKey = new kms.Key(this, `${props.resourcePrefix}-Aurora-KMS-Key`, {
             enabled: true,
             enableKeyRotation: true,
@@ -84,7 +93,7 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
         auroraSecurityGroup.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 
         // Create custom monitoring role instead of using AWS managed policy
-        const monitoringRole = new cdk.aws_iam.Role(this, `${props.resourcePrefix}-Aurora-Monitoring-Role`, {
+        const auroraMonitoringRole = new cdk.aws_iam.Role(this, `${props.resourcePrefix}-Aurora-Monitoring-Role`, {
             assumedBy: new cdk.aws_iam.ServicePrincipal('monitoring.rds.amazonaws.com'),
             description: 'Role for RDS Enhanced Monitoring',
             inlinePolicies: {
@@ -108,16 +117,16 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
                 }),
             },
         });
+        auroraMonitoringRole.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 
         // add NagSuppressions for the AwsSolutions-IAM5 warning for monitoringRole
-        NagSuppressions.addResourceSuppressions(monitoringRole, [
+        NagSuppressions.addResourceSuppressions(auroraMonitoringRole, [
             {
                 id: 'AwsSolutions-IAM5',
                 reason: 'Custom monitoring role is used instead of AWS managed policy',
             },
         ]);
 
-        const removalPolicy = props.deployEnvironment === 'production' ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY;
         const auroraDatabaseCluster = new rds.DatabaseCluster(this, `${props.resourcePrefix}-Aurora-Serverless`, {
             engine: rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_16_6 }),
             vpc,
@@ -145,9 +154,12 @@ export class AwsAuroraPgvectorServerlessNestedStack extends NestedStack {
             defaultDatabaseName: props.defaultDatabaseName,
             monitoringInterval: cdk.Duration.seconds(props.monitoringInterval),
             clusterScalabilityType: props.clusterScalabilityType,
-            monitoringRole: monitoringRole,
+            monitoringRole: auroraMonitoringRole,
             instanceUpdateBehaviour: rds.InstanceUpdateBehaviour.ROLLING,
             port: auroraPort,
+            subnetGroup: auroraSubnetGroup,
+            deletionProtection: props.deployEnvironment === 'production',
+            enableClusterLevelEnhancedMonitoring: props.deployEnvironment === 'production',
         });
         this.clusterIdentifier = auroraDatabaseCluster.clusterIdentifier;
 
