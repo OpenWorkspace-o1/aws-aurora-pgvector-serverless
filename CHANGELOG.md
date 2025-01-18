@@ -1,3 +1,13 @@
+## [2025-01-18][PR#8](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/8)
+
+### Added
+- Added `ARCHITECTURE` environment variable and `parseLambdaArchitectureFromEnv` utility for Lambda architecture configuration.
+- Enhanced Aurora Serverless stack with `instanceUpdateBehaviour`, `port`, and `subnetGroup` configurations.
+
+### Changed
+- Updated stack naming convention to include `owner` and `deployEnvironment`.
+- Improved deletion protection and monitoring role configuration for production environments.
+
 ## [2025-01-16](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/6)
 
 ### Changed

@@ -18,5 +18,6 @@ declare module NodeJS {
         STORAGE_TYPE: string;
         MONITORING_INTERVAL: number;
         CLUSTER_SCALABILITY_TYPE: string;
+        ARCHITECTURE: string;
     }
 }
