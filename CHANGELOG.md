@@ -1,3 +1,11 @@
+## [2025-01-18] [PR#10](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/10)
+
+### Added
+- Added `AwsAuroraDdlTriggerNestedStack` to handle RDS DDL triggers.
+- Implemented `rdsDdlTriggerFn` and `rdsDdlClusterTriggerFn` Lambda functions for RDS instance and cluster creation events.
+- Configured EventBridge rules for `CreateDBInstance` and `CreateDBCluster` events.
+- Added `@aws-cdk/aws-lambda-python-alpha` dependency for Python Lambda support.
+
 ## [2025-01-18] [PR#8](https://github.com/OpenWorkspace-o1/aws-aurora-pgvector-serverless/pull/8)
 
 ### Added
