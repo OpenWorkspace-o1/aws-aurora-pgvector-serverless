@@ -1,9 +1,9 @@
 import { AwsAuroraPgvectorServerlessBaseStackProps } from './../AwsAuroraPgvectorServerlessStackProps';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import path = require("path");
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as path from 'path';
 
 export interface AwsAuroraDDLSourceRDSNestedStackProps extends cdk.NestedStackProps, AwsAuroraPgvectorServerlessBaseStackProps {
   /**
@@ -20,7 +20,6 @@ export class AwsAuroraDDLSourceRDSNestedStack extends cdk.NestedStack {
 
     // create S3 bucket to host DDL file
     const sourceS3Bucket = new s3.Bucket(this, `${props.resourcePrefix}-ddl-source-bucket`, {
-        bucketName: `${props.deployEnvironment}-ddl-source-${props.clusterIdentifier}`,
         encryption: s3.BucketEncryption.S3_MANAGED,
         blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
         publicReadAccess: false,
